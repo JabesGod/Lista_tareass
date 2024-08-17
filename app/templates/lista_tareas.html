@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Tareas</title>
+</head>
+<body>
+    <h1>Lista de Tareas</h1>
+    <ul>
+        {% for tarea in tareas %}
+            <li>
+                {{ tarea.titulo }} - {% if tarea.completada %}Completada{% else %}Pendiente{% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'agregar_tarea' %}">Agregar nueva tarea</a>
+</body>
+</html>
