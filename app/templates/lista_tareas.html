@@ -2,19 +2,122 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lista de Tareas</title>
+    <!-- Enlace a la hoja de estilos de Bootstrap -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <h1>Lista de Tareas</h1>
-    <ul>
-        {% for tarea in tareas %}
-            <li>
-                {{ tarea.titulo }} - {% if tarea.completada %}Completada{% else %}Pendiente{% endif %}
-                <a href="{% url 'editar_tarea' tarea.id %}">Editar</a> |
-                <a href="{% url 'eliminar_tarea' tarea.id %}">Eliminar</a>
-            </li>
-        {% endfor %}
-    </ul>
-    <a href="{% url 'agregar_tarea' %}">Agregar nueva tarea</a>
+    <div class="container">
+        <h1 class="my-4">Lista de Tareas</h1>
+        <ul class="list-group">
+            {% for tarea in tareas %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div class="form-check">
+                        <!-- Checkbox para marcar la tarea como completada -->
+                        <input class="form-check-input" type="checkbox" id="tarea-{{ tarea.id }}" {% if tarea.completada %}checked{% endif %} disabled>
+                        <label class="form-check-label" for="tarea-{{ tarea.id }}">
+                            <strong>{{ tarea.titulo }}</strong> - 
+                            {% if tarea.completada %}
+                                <span class="badge badge-success">Completada</span>
+                            {% else %}
+                                <span class="badge badge-warning">Pendiente</span>
+                            {% endif %}
+                        </label>
+                    </div>
+                    <div>
+                        <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editarTareaModal-{{ tarea.id }}">Editar</button>
+                        <button class="btn btn-danger btn-sm" data-toggle="modal" data-target="#eliminarTareaModal-{{ tarea.id }}">Eliminar</button>
+                    </div>
+                </li>
+
+                <!-- Modal para editar tarea -->
+                <div class="modal fade" id="editarTareaModal-{{ tarea.id }}" tabindex="-1" aria-labelledby="editarTareaModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <form method="POST" action="{% url 'editar_tarea' tarea.id %}">
+                                {% csrf_token %}
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="editarTareaModalLabel">Editar Tarea</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="form-group">
+                                        <label for="titulo">Título</label>
+                                        <input type="text" class="form-control" name="titulo" value="{{ tarea.titulo }}" required>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                                    <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal para eliminar tarea -->
+                <div class="modal fade" id="eliminarTareaModal-{{ tarea.id }}" tabindex="-1" aria-labelledby="eliminarTareaModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <form method="POST" action="{% url 'eliminar_tarea' tarea.id %}">
+                                {% csrf_token %}
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="eliminarTareaModalLabel">Eliminar Tarea</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>¿Estás seguro de que deseas eliminar esta tarea?</p>
+                                    <p><strong>{{ tarea.titulo }}</strong></p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </ul>
+        <button class="btn btn-success mt-4" data-toggle="modal" data-target="#agregarTareaModal">Agregar nueva tarea</button>
+
+        <!-- Modal para agregar tarea -->
+        <div class="modal fade" id="agregarTareaModal" tabindex="-1" aria-labelledby="agregarTareaModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form method="POST" action="{% url 'agregar_tarea' %}">
+                        {% csrf_token %}
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="agregarTareaModalLabel">Agregar Tarea</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="titulo">Título</label>
+                                <input type="text" class="form-control" name="titulo" required>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                            <button type="submit" class="btn btn-success">Agregar Tarea</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Enlace a los scripts de Bootstrap y jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
